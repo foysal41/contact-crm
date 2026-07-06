@@ -15,10 +15,12 @@ import Link from "next/link";
 import { deleteContact } from "@/app/lib/actions/deleteContact";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const ContactList = ({ contacts, deleteContactAction, filterContact }) => {
-     const router = useRouter();
+const ContactList = ({ contacts, deleteContactAction }) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  
+
+  const currentPage = Number(searchParams.get("page")) || 1;
+
   const handleDelete = async (contactId) => {
     await deleteContactAction(contactId);
   };
@@ -36,6 +38,33 @@ const ContactList = ({ contacts, deleteContactAction, filterContact }) => {
     router.push(`/dashboard/contact?${params.toString()}`);
   };
 
+ const handleSort = (e) => {
+  const params = new URLSearchParams(searchParams);
+
+  params.set("sort", e.target.value);
+
+  router.push(`/dashboard/contact?${params.toString()}`);
+};
+
+  const handleFavorite = (e) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (e.target.value) {
+      params.set("favorite", e.target.value);
+    } else {
+      params.delete("favorite");
+    }
+
+    router.push(`/dashboard/contact?${params.toString()}`);
+  };
+
+  const handlePage = (page) => {
+    const params = new URLSearchParams(searchParams);
+
+    params.set("page", page);
+
+    router.push(`/dashboard/contact?${params.toString()}`);
+  };
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-6 md:px-10">
       <div className="mb-6 flex items-start justify-between">
@@ -69,21 +98,25 @@ const ContactList = ({ contacts, deleteContactAction, filterContact }) => {
             />
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button className="flex h-11 items-center justify-between gap-10 rounded-md border border-slate-300 px-4 text-sm text-slate-700 hover:bg-slate-50">
-              All Contacts
-              <ChevronDown className="size-4 text-slate-500" />
-            </button>
+          <div className="flex flex-wrap gap-3">           
 
-            <button className="flex h-11 items-center gap-2 rounded-md border border-slate-300 px-4 text-sm text-slate-700 hover:bg-slate-50">
-              <Funnel className="size-4" />
-              Filter
-            </button>
+            <select
+              defaultValue={searchParams.get("favorite") || ""}
+              onChange={handleFavorite}
+              className="h-11 rounded-md border border-slate-300 px-4 text-sm"
+            >
+              <option value="">All Contacts</option>
+              <option value="1">Favorite</option>
+            </select>
 
-            <button className="flex h-11 items-center justify-between gap-10 rounded-md border border-slate-300 px-4 text-sm text-slate-700 hover:bg-slate-50">
-              Sort: Newest
-              <ChevronDown className="size-4 text-slate-500" />
-            </button>
+            <select
+              defaultValue={searchParams.get("sort") || "newest"}
+              onChange={handleSort}
+              className="h-11 rounded-md border border-slate-300 px-4 text-sm text-slate-700"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
           </div>
         </div>
 
@@ -199,9 +232,11 @@ const ContactList = ({ contacts, deleteContactAction, filterContact }) => {
                         </button>{" "}
                       </Link>
 
-                      <button className="text-blue-600 hover:text-blue-800">
+                     <Link href={`/dashboard/contact/${contact._id}/edit`} >
+                       <button className="text-blue-600 hover:text-blue-800">
                         <Pencil className="size-4" />
                       </button>
+                     </Link>
 
                       <button
                         onClick={() => handleDelete(contact._id)}
@@ -221,15 +256,30 @@ const ContactList = ({ contacts, deleteContactAction, filterContact }) => {
           <p>Showing 1 to {contacts.length} contacts</p>
 
           <div className="flex items-center gap-2">
-            <button className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50">
+            {/* <button className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50">
+              <ChevronLeft className="size-4" />
+            </button> */}
+
+            {/* <button className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50">
+              <ChevronRight className="size-4" />
+            </button> */}
+
+            <button
+              onClick={() => handlePage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50"
+            >
               <ChevronLeft className="size-4" />
             </button>
 
-            <button className="flex size-9 items-center justify-center rounded-md bg-blue-600 font-medium text-white">
-              1
+            <button className="flex size-9 items-center justify-center rounded-md bg-blue-600 text-white">
+              {currentPage}
             </button>
 
-            <button className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50">
+            <button
+              onClick={() => handlePage(currentPage + 1)}
+              className="flex size-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-50"
+            >
               <ChevronRight className="size-4" />
             </button>
           </div>

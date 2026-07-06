@@ -1,10 +1,5 @@
-import Image from "next/image";
-import RootLayout from "./layout";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div className="">
-      <h1>Home Page</h1>
-    </div>
-  );
+export default function HomePage() {
+  redirect("/dashboard/contact");
 }

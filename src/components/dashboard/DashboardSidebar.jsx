@@ -18,8 +18,6 @@ export function DashboardSidebar() {
 
   const navItems = [
     { icon: Person, label: "Contacts",  href: "/dashboard/contact", },
-    { icon: Star, label: "Favorites", href: "/dashboard/favorites" },
-    { icon: SquareListUl, label: "Notes", href: "/dashboard/notes" },
     { icon: ChartColumn, label: "Statistics", href: "/dashboard/statistics" },
   ];
 
